@@ -7,7 +7,12 @@ export default function CachePage() {
 
   const fetchTimestamp = async () => {
     try {
-      const response = await fetch("/api/timestamp");
+      const response = await fetch("/api/timestamp", {
+        cache: "force-cache",
+        next: {
+          revalidate: 3,
+        },
+      });
       const data = await response.json();
       setTimestamp(data.timestamp);
     } catch (error) {
