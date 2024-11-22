@@ -1,29 +1,24 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { getTimestamp, refreshTimestamp } from '@/action/timestamp';
+import { useState, useEffect } from 'react';
 
 export default function CachePage() {
   const [timestamp, setTimestamp] = useState<string>("");
 
-  const fetchTimestamp = async () => {
-    try {
-      const response = await fetch("/api/timestamp", {
-        cache: "force-cache",
-        next: {
-          revalidate: 3,
-        },
-      });
-      const data = await response.json();
-      setTimestamp(data.timestamp);
-    } catch (error) {
-      console.error("Error fetching timestamp:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchTimestamp = async () => {
+      const data = await getTimestamp();
+      setTimestamp(data.timestamp);
+    };
     fetchTimestamp();
   }, []);
 
+  const handleRefresh = async () => {
+    await refreshTimestamp();
+    const data = await getTimestamp();
+    setTimestamp(data.timestamp);
+  };
+  
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Cache Testing Page</h1>
@@ -37,8 +32,8 @@ export default function CachePage() {
         />
       </div>
       <button
-        onClick={fetchTimestamp}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        onClick={handleRefresh}
       >
         Refresh Timestamp
       </button>
